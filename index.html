@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>مستكشف منطقة عسير</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+        body {
+            background: #eef2f1;
+            color: #18312e;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-heading {
+            position: absolute;
+            z-index: 500;
+            top: 18px;
+            right: 18px;
+            max-width: min(390px, calc(100% - 36px));
+            padding: 16px 20px;
+            border: 1px solid rgba(24, 49, 46, 0.08);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 8px 28px rgba(24, 49, 46, 0.14);
+            max-height: calc(100% - 36px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        .map-heading h1 {
+            margin: 0 0 7px;
+            font-size: 19px;
+        }
+
+        .map-heading p {
+            margin: 0;
+            color: #60716e;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .feature-search {
+            display: grid;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .feature-search label {
+            display: grid;
+            gap: 5px;
+            font-size: 13px;
+        }
+
+        .feature-search select {
+            width: 100%;
+            min-height: 36px;
+            padding: 6px 9px;
+            border: 1px solid #cbd5d3;
+            border-radius: 7px;
+            background: #fff;
+            color: #18312e;
+            font: inherit;
+        }
+
+        .feature-search select:disabled {
+            background: #f1f3f3;
+            color: #84918f;
+        }
+
+        .project-search {
+            display: grid;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e1e7e6;
+        }
+
+        .project-search-title {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .layer-opacity-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .opacity-control {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 7px 8px;
+            font-size: 13px;
+        }
+
+        .opacity-control input {
+            grid-column: 1 / -1;
+            width: 100%;
+            margin: 0;
+            accent-color: #1976d2;
+            cursor: pointer;
+        }
+
+        .opacity-value {
+            color: #60716e;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .map-message {
+            position: absolute;
+            z-index: 1000;
+            right: 50%;
+            bottom: 24px;
+            width: max-content;
+            max-width: calc(100% - 32px);
+            padding: 12px 16px;
+            transform: translateX(50%);
+            border-radius: 10px;
+            background: #18312e;
+            color: #fff;
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(24, 49, 46, 0.2);
+        }
+
+        .map-message.error {
+            background: #8c3028;
+        }
+
+        .leaflet-control-layers,
+        .leaflet-control-attribution {
+            direction: rtl;
+        }
+
+        @media (max-width: 600px) {
+            .map-heading {
+                top: 12px;
+                right: 12px;
+                max-width: calc(100% - 24px);
+                max-height: calc(100% - 24px);
+                padding: 12px 15px;
+            }
+
+            .map-heading h1 {
+                font-size: 16px;
+            }
+
+            .map-heading p {
+                font-size: 12px;
+            }
+
+            .leaflet-top.leaflet-left {
+                top: 104px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main id="map" aria-label="خريطة تفاعلية لمنطقة عسير"></main>
+    <header class="map-heading">
+        <h1>مستكشف منطقة عسير</h1>
+        <div class="feature-search">
+            <label for="governorate-search">
+                المحافظة
+                <select id="governorate-search">
+                    <option value="">اختر المحافظة</option>
+                </select>
+            </label>
+            <label for="center-search">
+                المركز
+                <select id="center-search" disabled>
+                    <option value="">اختر المحافظة أولًا</option>
+                </select>
+            </label>
+            <label for="district-search">
+                الحي
+                <select id="district-search" disabled>
+                    <option value="">اختر المحافظة أولًا</option>
+                </select>
+            </label>
+            <section class="project-search" aria-labelledby="project-search-title">
+                <h2 class="project-search-title" id="project-search-title">المشاريع</h2>
+                <label for="project-type-search">
+                    نوع المشروع
+                    <select id="project-type-search">
+                        <option value="">اختر نوع المشروع</option>
+                        <option value="wastewater">مشاريع الصرف الصحي</option>
+                        <option value="water">مشاريع المياه</option>
+                    </select>
+                </label>
+                <label for="project-status-search">
+                    حالة المشاريع
+                    <select id="project-status-search" disabled>
+                        <option value="">اختر نوع المشروع أولًا</option>
+                    </select>
+                </label>
+                <label for="project-search">
+                    المشروع
+                    <select id="project-search" disabled>
+                        <option value="">تُضاف المشاريع عبر ملفات JSON لاحقًا</option>
+                    </select>
+                </label>
+            </section>
+        </div>
+        <div class="layer-opacity-controls">
+            <label class="opacity-control" for="governorate-opacity">
+                <span>المحافظات</span>
+                <output class="opacity-value" id="governorate-opacity-value" for="governorate-opacity">20٪</output>
+                <input id="governorate-opacity" type="range" min="0" max="100" value="20" aria-label="المحافظات">
+            </label>
+            <label class="opacity-control" for="district-opacity">
+                <span>الأحياء</span>
+                <output class="opacity-value" id="district-opacity-value" for="district-opacity">20٪</output>
+                <input id="district-opacity" type="range" min="0" max="100" value="20" aria-label="الأحياء">
+            </label>
+        </div>
+    </header>
+    <div id="map-message" class="map-message" role="status">جارٍ تحميل بيانات الخريطة...</div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.12.1/proj4.js"></script>
+    <script>
+        const message = document.getElementById("map-message");
+        const projectStatuses = [
+            { value: "existing", label: "المشاريع القائمة" },
+            { value: "under-construction", label: "المشاريع تحت التنفيذ" },
+            { value: "future", label: "المشاريع المستقبلية" }
+        ];
+
+        if (!window.L || !window.proj4) {
+            message.textContent = "تعذر تحميل مكتبات الخريطة. تحقق من اتصال الإنترنت ثم أعد فتح الصفحة.";
+            message.classList.add("error");
+            throw new Error("Leaflet or Proj4 could not be loaded.");
+        }
+
+        const map = L.map("map", { zoomControl: false }).setView([18.2, 42.5], 8);
+
+        L.control.zoom({ position: "bottomleft" }).addTo(map);
+        const satelliteLayer = L.tileLayer(
+            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+            {
+                maxZoom: 19,
+                attribution: "Tiles &copy; Esri — Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community"
+            }
+        ).addTo(map);
+        const streetLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        });
+
+        proj4.defs("EPSG:32638", "+proj=utm +zone=38 +datum=WGS84 +units=m +no_defs +type=crs");
+
+        function makeLayer(data, color, nameField, fallbackField, styleOverrides) {
+            return L.geoJSON(data, {
+                coordsToLatLng: function (coordinates) {
+                    const projected = proj4("EPSG:32638", "EPSG:4326", [coordinates[0], coordinates[1]]);
+                    return L.latLng(projected[1], projected[0]);
+                },
+                onEachFeature: function (feature, layer) {
+                    const properties = feature.properties || {};
+                    const name = properties[nameField] || properties[fallbackField];
+                    if (name) {
+                        const popup = document.createElement("strong");
+                        popup.textContent = String(name);
+                        layer.bindPopup(popup);
+                    }
+                },
+                style: Object.assign({
+                    color: color,
+                    weight: 1.5,
+                    opacity: 0.9,
+                    fillColor: color,
+                    fillOpacity: 0.12
+                }, styleOverrides || {}),
+            });
+        }
+
+        async function loadMapData() {
+            const files = ["AS_BM_AD_GOV.geojson", "AS_BM_AD_MKZ.geojson", "AS_BM_AD_DIS.geojson"];
+            const responses = await Promise.all(files.map(function (file) {
+                return fetch(file).then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("تعذر تحميل الملف " + file);
+                    }
+                    return response.json();
+                });
+            }));
+            const governorates = responses[0];
+            const centers = responses[1];
+            const districts = responses[2];
+
+            if (!Array.isArray(governorates.features) || !Array.isArray(centers.features) || !Array.isArray(districts.features)) {
+                throw new Error("محتوى أحد ملفات GeoJSON غير صالح.");
+            }
+
+            const governorateColor = "#1976d2";
+            const districtColor = "#e53935";
+            const governorateLayer = makeLayer(governorates, governorateColor, "GovernorateNameA", "GovernorateNameE");
+            const centerLayer = makeLayer(centers, "#171717", "MarkazNameA", "MarkazNameE", {
+                weight: 1.5,
+                fillOpacity: 0,
+                dashArray: "6 5"
+            });
+            const districtLayer = makeLayer(districts, districtColor, "DistrictNameA", "DistrictNameE");
+            const governorateOpacitySlider = document.getElementById("governorate-opacity");
+            const districtOpacitySlider = document.getElementById("district-opacity");
+            const governorateOpacityValue = document.getElementById("governorate-opacity-value");
+            const districtOpacityValue = document.getElementById("district-opacity-value");
+            const governorateSearch = document.getElementById("governorate-search");
+            const centerSearch = document.getElementById("center-search");
+            const districtSearch = document.getElementById("district-search");
+            const projectTypeSearch = document.getElementById("project-type-search");
+            const projectStatusSearch = document.getElementById("project-status-search");
+            const governorateFeatures = governorateLayer.getLayers();
+            const centerFeatures = centerLayer.getLayers();
+            const districtFeatures = districtLayer.getLayers();
+            let selectedGovernorate = null;
+            let selectedCenter = null;
+            let selectedDistrict = null;
+
+            function applyGovernorateStyles() {
+                governorateLayer.setStyle({
+                    color: governorateColor,
+                    weight: 1.5,
+                    opacity: 0.9,
+                    fillColor: governorateColor,
+                    fillOpacity: Number(governorateOpacitySlider.value) / 100
+                });
+                if (selectedGovernorate) {
+                    selectedGovernorate.setStyle({ color: "#ffbf00", weight: 4, opacity: 1 });
+                    selectedGovernorate.bringToFront();
+                }
+            }
+
+            function applyDistrictStyles() {
+                districtLayer.setStyle({
+                    color: districtColor,
+                    weight: 1.5,
+                    opacity: 0.9,
+                    fillColor: districtColor,
+                    fillOpacity: Number(districtOpacitySlider.value) / 100
+                });
+                if (selectedDistrict) {
+                    selectedDistrict.setStyle({
+                        color: "#168a45",
+                        weight: 4,
+                        opacity: 1,
+                        fillColor: "#168a45",
+                        fillOpacity: Math.max(Number(districtOpacitySlider.value) / 100, 0.3)
+                    });
+                    selectedDistrict.bringToFront();
+                }
+            }
+
+            function applyCenterStyles() {
+                centerLayer.setStyle({
+                    color: "#171717",
+                    weight: 1.5,
+                    opacity: 0.9,
+                    fillColor: "#171717",
+                    fillOpacity: 0,
+                    dashArray: "6 5"
+                });
+                if (selectedCenter) {
+                    selectedCenter.setStyle({ weight: 3, dashArray: "3 3" });
+                    selectedCenter.bringToFront();
+                }
+            }
+
+            function focusFeature(layer, featureGroup) {
+                if (!map.hasLayer(featureGroup)) {
+                    map.addLayer(featureGroup);
+                }
+                const bounds = layer.getBounds();
+                if (bounds.isValid()) {
+                    map.fitBounds(bounds, { padding: [32, 32], maxZoom: 14 });
+                }
+            }
+
+            governorateFeatures.forEach(function (featureLayer, index) {
+                const properties = featureLayer.feature.properties || {};
+                const option = document.createElement("option");
+                option.value = String(index);
+                option.textContent = properties.GovernorateNameA || properties.GovernorateNameE || "محافظة غير معروفة";
+                governorateSearch.appendChild(option);
+            });
+
+            governorateSearch.addEventListener("change", function () {
+                selectedGovernorate = governorateSearch.value === ""
+                    ? null
+                    : governorateFeatures[Number(governorateSearch.value)] || null;
+                selectedCenter = null;
+                selectedDistrict = null;
+                centerSearch.replaceChildren();
+                districtSearch.replaceChildren();
+
+                const centerPlaceholder = document.createElement("option");
+                centerPlaceholder.value = "";
+                centerPlaceholder.textContent = selectedGovernorate ? "اختر المركز" : "اختر المحافظة أولًا";
+                centerSearch.appendChild(centerPlaceholder);
+                centerSearch.disabled = !selectedGovernorate;
+
+                const placeholder = document.createElement("option");
+                placeholder.value = "";
+                placeholder.textContent = selectedGovernorate ? "اختر الحي" : "اختر المحافظة أولًا";
+                districtSearch.appendChild(placeholder);
+                districtSearch.disabled = !selectedGovernorate;
+
+                if (selectedGovernorate) {
+                    const governorateName = selectedGovernorate.feature.properties.GovernorateNameA;
+                    const matchingCenters = centerFeatures
+                        .map(function (featureLayer, index) {
+                            return { layer: featureLayer, index: index, properties: featureLayer.feature.properties || {} };
+                        })
+                        .filter(function (center) {
+                            return center.properties.GovernorateNameA === governorateName;
+                        })
+                        .sort(function (first, second) {
+                            const firstName = first.properties.MarkazNameA || first.properties.MarkazNameE || "";
+                            const secondName = second.properties.MarkazNameA || second.properties.MarkazNameE || "";
+                            return firstName.localeCompare(secondName, "ar");
+                        });
+
+                    matchingCenters.forEach(function (center) {
+                        const option = document.createElement("option");
+                        option.value = String(center.index);
+                        option.textContent = center.properties.MarkazNameA || center.properties.MarkazNameE || "مركز غير معروف";
+                        centerSearch.appendChild(option);
+                    });
+
+                    if (matchingCenters.length === 0) {
+                        centerPlaceholder.textContent = "لا توجد مراكز مسجلة لهذه المحافظة";
+                        centerSearch.disabled = true;
+                    }
+
+                    const matchingDistricts = districtFeatures
+                        .map(function (featureLayer, index) {
+                            return { layer: featureLayer, index: index, properties: featureLayer.feature.properties || {} };
+                        })
+                        .filter(function (district) {
+                            return district.properties.GovernorateNameA === governorateName;
+                        })
+                        .sort(function (first, second) {
+                            const firstName = first.properties.DistrictNameA || first.properties.DistrictNameE || "";
+                            const secondName = second.properties.DistrictNameA || second.properties.DistrictNameE || "";
+                            return firstName.localeCompare(secondName, "ar");
+                        });
+
+                    matchingDistricts.forEach(function (district) {
+                        const option = document.createElement("option");
+                        option.value = String(district.index);
+                        option.textContent = district.properties.DistrictNameA || district.properties.DistrictNameE || "حي غير معروف";
+                        districtSearch.appendChild(option);
+                    });
+
+                    if (matchingDistricts.length === 0) {
+                        placeholder.textContent = "لا توجد أحياء مسجلة لهذه المحافظة";
+                        districtSearch.disabled = true;
+                    }
+                }
+
+                applyGovernorateStyles();
+                applyCenterStyles();
+                applyDistrictStyles();
+                if (selectedGovernorate) {
+                    focusFeature(selectedGovernorate, governorateLayer);
+                }
+            });
+
+            centerSearch.addEventListener("change", function () {
+                selectedCenter = centerSearch.value === ""
+                    ? null
+                    : centerFeatures[Number(centerSearch.value)] || null;
+                applyCenterStyles();
+                if (selectedCenter) {
+                    focusFeature(selectedCenter, centerLayer);
+                }
+            });
+
+            districtSearch.addEventListener("change", function () {
+                selectedDistrict = districtSearch.value === ""
+                    ? null
+                    : districtFeatures[Number(districtSearch.value)] || null;
+                applyDistrictStyles();
+                if (selectedDistrict) {
+                    focusFeature(selectedDistrict, districtLayer);
+                }
+            });
+
+            projectTypeSearch.addEventListener("change", function () {
+                projectStatusSearch.replaceChildren();
+                const placeholder = document.createElement("option");
+                placeholder.value = "";
+                placeholder.textContent = projectTypeSearch.value
+                    ? "اختر حالة المشاريع"
+                    : "اختر نوع المشروع أولًا";
+                projectStatusSearch.appendChild(placeholder);
+                projectStatusSearch.disabled = !projectTypeSearch.value;
+
+                if (projectTypeSearch.value) {
+                    projectStatuses.forEach(function (status) {
+                        const option = document.createElement("option");
+                        option.value = status.value;
+                        option.textContent = status.label;
+                        projectStatusSearch.appendChild(option);
+                    });
+                }
+
+                const projectSearch = document.getElementById("project-search");
+                projectSearch.replaceChildren();
+                const projectPlaceholder = document.createElement("option");
+                projectPlaceholder.value = "";
+                projectPlaceholder.textContent = "تُضاف المشاريع عبر ملفات JSON لاحقًا";
+                projectSearch.appendChild(projectPlaceholder);
+                projectSearch.disabled = true;
+            });
+
+            projectStatusSearch.addEventListener("change", function () {
+                const projectSearch = document.getElementById("project-search");
+                projectSearch.replaceChildren();
+                const placeholder = document.createElement("option");
+                placeholder.value = "";
+                placeholder.textContent = projectStatusSearch.value
+                    ? "لا توجد بيانات مشاريع مضافة لهذه الفئة حاليًا"
+                    : "تُضاف المشاريع عبر ملفات JSON لاحقًا";
+                projectSearch.appendChild(placeholder);
+                projectSearch.disabled = true;
+            });
+
+            governorateOpacitySlider.addEventListener("input", function () {
+                const percentage = Number(governorateOpacitySlider.value);
+                applyGovernorateStyles();
+                governorateOpacityValue.value = percentage + "٪";
+                governorateOpacityValue.textContent = percentage + "٪";
+            });
+            districtOpacitySlider.addEventListener("input", function () {
+                const percentage = Number(districtOpacitySlider.value);
+                applyDistrictStyles();
+                districtOpacityValue.value = percentage + "٪";
+                districtOpacityValue.textContent = percentage + "٪";
+            });
+            governorateLayer.addTo(map);
+            districtLayer.addTo(map);
+            centerLayer.addTo(map);
+            L.control.layers({
+                "صور الأقمار الصناعية": satelliteLayer,
+                "خريطة الشوارع": streetLayer
+            }, {
+                ["المحافظات (" + governorates.features.length + ")"]: governorateLayer,
+                ["المراكز (" + centers.features.length + ")"]: centerLayer,
+                ["الأحياء (" + districts.features.length + ")"]: districtLayer
+            }, { position: "topleft", collapsed: false }).addTo(map);
+
+            const bounds = L.featureGroup([governorateLayer, centerLayer, districtLayer]).getBounds();
+            if (bounds.isValid()) {
+                map.fitBounds(bounds, { padding: [24, 24] });
+            }
+
+            message.hidden = true;
+        }
+
+        loadMapData().catch(function (error) {
+            const localFileHint = window.location.protocol === "file:"
+                ? " شغّل الصفحة عبر خادم محلي (مثل Live Server) بدل فتح ملف HTML مباشرة."
+                : " تحقق من رفع ملفات GeoJSON الثلاثة بجانب index.html ومن اتصال الإنترنت.";
+            message.textContent = error.message + localFileHint;
+            message.classList.add("error");
+            console.error("تعذر تحميل بيانات الخريطة:", error);
+        });
+    </script>
+</body>
+</html>
