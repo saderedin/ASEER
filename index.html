@@ -33,6 +33,7 @@
             z-index: 500;
             top: 18px;
             right: 18px;
+            width: min(390px, calc(100vw - 36px));
             max-width: min(390px, calc(100% - 36px));
             padding: 16px 20px;
             border: 1px solid rgba(154, 220, 255, 0.8);
@@ -43,7 +44,8 @@
                 0 0 12px rgba(55, 173, 255, 0.75),
                 0 0 30px rgba(0, 115, 255, 0.48),
                 0 12px 32px rgba(2, 28, 72, 0.35);
-            max-height: calc(100% - 36px);
+            max-height: calc(100vh - 36px);
+            max-height: calc(100dvh - 36px);
             overflow-y: auto;
             overscroll-behavior: contain;
         }
@@ -213,28 +215,119 @@
 
         @media (max-width: 600px) {
             .map-heading {
-                top: 12px;
-                right: 12px;
-                max-width: calc(100% - 24px);
-                max-height: calc(100% - 24px);
-                padding: 12px 15px;
+                top: max(8px, env(safe-area-inset-top));
+                right: 8px;
+                width: calc(100vw - 16px);
+                max-width: none;
+                max-height: min(62vh, calc(100vh - 16px));
+                max-height: min(62dvh, calc(100dvh - 16px));
+                padding: 12px;
+                border-radius: 12px;
             }
 
             html[dir="ltr"] .map-heading {
                 right: auto;
-                left: 12px;
+                left: 8px;
+            }
+
+            .map-heading-header {
+                gap: 8px;
+            }
+
+            .map-heading-actions {
+                gap: 5px;
+            }
+
+            .map-heading-toggle {
+                min-height: 40px;
+                padding: 7px 9px;
+                font-size: 12px;
             }
 
             .map-heading h1 {
-                font-size: 16px;
+                font-size: clamp(15px, 4vw, 18px);
             }
 
             .map-heading p {
                 font-size: 12px;
             }
 
-            .leaflet-top.leaflet-left {
-                top: 104px;
+            .feature-search {
+                gap: 8px;
+                margin-top: 8px;
+            }
+
+            .feature-search select {
+                min-height: 40px;
+                font-size: 16px;
+            }
+
+            .project-search {
+                gap: 8px;
+                padding-top: 8px;
+            }
+
+            .layer-opacity-controls {
+                gap: 8px;
+                margin-top: 10px;
+            }
+
+            .opacity-control input {
+                min-height: 24px;
+            }
+
+            .leaflet-control-layers {
+                max-width: calc(100vw - 72px);
+            }
+
+            .leaflet-control-layers-expanded {
+                max-height: 40vh;
+                overflow-y: auto;
+            }
+
+            .leaflet-bottom .leaflet-control-attribution {
+                position: fixed;
+                right: auto;
+                bottom: 0;
+                left: 50vw;
+                width: max-content;
+                max-width: calc(100vw - 128px);
+                transform: translateX(-50%);
+                text-align: center;
+                white-space: normal;
+            }
+
+            .map-message {
+                bottom: max(12px, env(safe-area-inset-bottom));
+                max-width: calc(100vw - 24px);
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 600px) and (max-height: 520px) {
+            .map-heading {
+                max-height: calc(100vh - 16px);
+                max-height: calc(100dvh - 16px);
+                width: min(390px, calc(100vw - 16px));
+            }
+
+            .map-heading-content {
+                margin-top: 6px;
+            }
+
+            .feature-search {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                align-items: start;
+            }
+
+            .project-search {
+                grid-column: 1 / -1;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .project-search-title {
+                grid-column: 1 / -1;
             }
         }
     </style>
@@ -631,6 +724,7 @@
                 if (layerControl) {
                     map.removeControl(layerControl);
                 }
+                const isMobile = window.matchMedia("(max-width: 600px)").matches;
                 layerControl = L.control.layers({
                     [translate("satellite")]: satelliteLayer,
                     [translate("streets")]: streetLayer
@@ -639,9 +733,14 @@
                     [translate("centerLayer") + " (" + centers.features.length + ")"]: centerLayer,
                     [translate("districtLayer") + " (" + districts.features.length + ")"]: districtLayer
                 }, {
-                    position: currentLanguage === "ar" ? "topleft" : "topright",
-                    collapsed: false
+                    position: isMobile
+                        ? currentLanguage === "ar" ? "bottomright" : "bottomleft"
+                        : currentLanguage === "ar" ? "topleft" : "topright",
+                    collapsed: isMobile
                 }).addTo(map);
+                zoomControl.setPosition(
+                    isMobile && currentLanguage === "en" ? "bottomright" : "bottomleft"
+                );
             }
 
             refreshDynamicLanguage = function () {
@@ -696,6 +795,10 @@
                 zoomOut.title = translate("zoomOut");
                 zoomOut.setAttribute("aria-label", translate("zoomOut"));
             };
+
+            window.addEventListener("resize", function () {
+                refreshLayerControl();
+            });
 
             function applyGovernorateStyles() {
                 governorateLayer.setStyle({
