@@ -45,8 +45,45 @@
         }
 
         .map-heading h1 {
-            margin: 0 0 7px;
+            margin: 0;
             font-size: 19px;
+        }
+
+        .map-heading-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .map-heading-toggle {
+            flex: 0 0 auto;
+            min-height: 34px;
+            padding: 6px 10px;
+            border: 1px solid #cbd5d3;
+            border-radius: 7px;
+            background: #fff;
+            color: #18312e;
+            font: inherit;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .map-heading-toggle:hover {
+            background: #f1f5f4;
+        }
+
+        .map-heading-toggle:focus-visible {
+            outline: 2px solid #1976d2;
+            outline-offset: 2px;
+        }
+
+        .map-heading-content {
+            margin-top: 10px;
+        }
+
+        .map-heading-content[hidden] {
+            display: none;
         }
 
         .map-heading p {
@@ -177,61 +214,67 @@
 <body>
     <main id="map" aria-label="خريطة تفاعلية لمنطقة عسير"></main>
     <header class="map-heading">
-        <h1>مستكشف منطقة عسير</h1>
-        <div class="feature-search">
-            <label for="governorate-search">
-                المحافظة
-                <select id="governorate-search">
-                    <option value="">اختر المحافظة</option>
-                </select>
-            </label>
-            <label for="center-search">
-                المركز
-                <select id="center-search" disabled>
-                    <option value="">اختر المحافظة أولًا</option>
-                </select>
-            </label>
-            <label for="district-search">
-                الحي
-                <select id="district-search" disabled>
-                    <option value="">اختر المحافظة أولًا</option>
-                </select>
-            </label>
-            <section class="project-search" aria-labelledby="project-search-title">
-                <h2 class="project-search-title" id="project-search-title">المشاريع</h2>
-                <label for="project-type-search">
-                    نوع المشروع
-                    <select id="project-type-search">
-                        <option value="">اختر نوع المشروع</option>
-                        <option value="wastewater">مشاريع الصرف الصحي</option>
-                        <option value="water">مشاريع المياه</option>
-                    </select>
-                </label>
-                <label for="project-status-search">
-                    حالة المشاريع
-                    <select id="project-status-search" disabled>
-                        <option value="">اختر نوع المشروع أولًا</option>
-                    </select>
-                </label>
-                <label for="project-search">
-                    المشروع
-                    <select id="project-search" disabled>
-                        <option value="">تُضاف المشاريع عبر ملفات JSON لاحقًا</option>
-                    </select>
-                </label>
-            </section>
+        <div class="map-heading-header">
+            <h1>مستكشف منطقة عسير</h1>
+            <button class="map-heading-toggle" id="map-heading-toggle" type="button"
+                aria-expanded="true" aria-controls="map-heading-content">إخفاء القائمة</button>
         </div>
-        <div class="layer-opacity-controls">
-            <label class="opacity-control" for="governorate-opacity">
-                <span>المحافظات</span>
-                <output class="opacity-value" id="governorate-opacity-value" for="governorate-opacity">20٪</output>
-                <input id="governorate-opacity" type="range" min="0" max="100" value="20" aria-label="المحافظات">
-            </label>
-            <label class="opacity-control" for="district-opacity">
-                <span>الأحياء</span>
-                <output class="opacity-value" id="district-opacity-value" for="district-opacity">20٪</output>
-                <input id="district-opacity" type="range" min="0" max="100" value="20" aria-label="الأحياء">
-            </label>
+        <div class="map-heading-content" id="map-heading-content">
+            <div class="feature-search">
+                <label for="governorate-search">
+                    المحافظة
+                    <select id="governorate-search">
+                        <option value="">اختر المحافظة</option>
+                    </select>
+                </label>
+                <label for="center-search">
+                    المركز
+                    <select id="center-search" disabled>
+                        <option value="">اختر المحافظة أولًا</option>
+                    </select>
+                </label>
+                <label for="district-search">
+                    الحي
+                    <select id="district-search" disabled>
+                        <option value="">اختر المحافظة أولًا</option>
+                    </select>
+                </label>
+                <section class="project-search" aria-labelledby="project-search-title">
+                    <h2 class="project-search-title" id="project-search-title">المشاريع</h2>
+                    <label for="project-type-search">
+                        نوع المشروع
+                        <select id="project-type-search">
+                            <option value="">اختر نوع المشروع</option>
+                            <option value="wastewater">مشاريع الصرف الصحي</option>
+                            <option value="water">مشاريع المياه</option>
+                        </select>
+                    </label>
+                    <label for="project-status-search">
+                        حالة المشاريع
+                        <select id="project-status-search" disabled>
+                            <option value="">اختر نوع المشروع أولًا</option>
+                        </select>
+                    </label>
+                    <label for="project-search">
+                        المشروع
+                        <select id="project-search" disabled>
+                            <option value="">تُضاف المشاريع عبر ملفات JSON لاحقًا</option>
+                        </select>
+                    </label>
+                </section>
+            </div>
+            <div class="layer-opacity-controls">
+                <label class="opacity-control" for="governorate-opacity">
+                    <span>المحافظات</span>
+                    <output class="opacity-value" id="governorate-opacity-value" for="governorate-opacity">20٪</output>
+                    <input id="governorate-opacity" type="range" min="0" max="100" value="20" aria-label="المحافظات">
+                </label>
+                <label class="opacity-control" for="district-opacity">
+                    <span>الأحياء</span>
+                    <output class="opacity-value" id="district-opacity-value" for="district-opacity">20٪</output>
+                    <input id="district-opacity" type="range" min="0" max="100" value="20" aria-label="الأحياء">
+                </label>
+            </div>
         </div>
     </header>
     <div id="map-message" class="map-message" role="status">جارٍ تحميل بيانات الخريطة...</div>
@@ -240,11 +283,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.12.1/proj4.js"></script>
     <script>
         const message = document.getElementById("map-message");
+        const mapHeadingToggle = document.getElementById("map-heading-toggle");
+        const mapHeadingContent = document.getElementById("map-heading-content");
         const projectStatuses = [
             { value: "existing", label: "المشاريع القائمة" },
             { value: "under-construction", label: "المشاريع تحت التنفيذ" },
             { value: "future", label: "المشاريع المستقبلية" }
         ];
+
+        mapHeadingToggle.addEventListener("click", function () {
+            const isExpanded = mapHeadingToggle.getAttribute("aria-expanded") === "true";
+            mapHeadingToggle.setAttribute("aria-expanded", String(!isExpanded));
+            mapHeadingToggle.textContent = isExpanded ? "إظهار القائمة" : "إخفاء القائمة";
+            mapHeadingContent.hidden = isExpanded;
+        });
 
         if (!window.L || !window.proj4) {
             message.textContent = "تعذر تحميل مكتبات الخريطة. تحقق من اتصال الإنترنت ثم أعد فتح الصفحة.";
