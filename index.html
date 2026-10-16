@@ -28,6 +28,237 @@
             height: 100%;
         }
 
+        .welcome-screen {
+            position: fixed;
+            z-index: 1100;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: max(24px, env(safe-area-inset-top)) clamp(20px, 6vw, 88px)
+                max(24px, env(safe-area-inset-bottom));
+            background:
+                linear-gradient(90deg, rgba(3, 21, 54, 0.3), rgba(4, 39, 91, 0.72) 55%, rgba(3, 26, 68, 0.9)),
+                linear-gradient(0deg, rgba(2, 20, 50, 0.72), rgba(2, 20, 50, 0.08) 72%),
+                url("./assets/aseer.webp") center / cover no-repeat;
+            color: #fff;
+            font-family: "Simplified Arabic", Arial, sans-serif;
+            font-weight: 700;
+            isolation: isolate;
+        }
+
+        .welcome-screen[hidden] {
+            display: none;
+        }
+
+        .welcome-screen::before,
+        .welcome-screen::after {
+            position: absolute;
+            z-index: -1;
+            pointer-events: none;
+            content: "";
+        }
+
+        .welcome-screen::before {
+            inset: 0 0 0 35%;
+            opacity: 0.24;
+            background: repeating-radial-gradient(
+                ellipse at 72% 48%,
+                transparent 0 34px,
+                rgba(176, 224, 255, 0.48) 35px 36px,
+                transparent 37px 68px
+            );
+            mask-image: linear-gradient(90deg, transparent, #000 35%, #000);
+        }
+
+        .welcome-screen::after {
+            top: 12%;
+            left: -12%;
+            width: 48vw;
+            height: 48vw;
+            min-width: 360px;
+            min-height: 360px;
+            border: 1px solid rgba(176, 224, 255, 0.24);
+            border-radius: 50%;
+            box-shadow: 0 0 0 42px rgba(176, 224, 255, 0.045),
+                0 0 0 84px rgba(176, 224, 255, 0.035);
+        }
+
+        .welcome-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: min(1180px, 100%);
+            margin: 0 auto;
+        }
+
+        .welcome-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .welcome-brand-mark {
+            display: grid;
+            width: 42px;
+            height: 42px;
+            place-items: center;
+            border: 1px solid rgba(176, 224, 255, 0.78);
+            border-radius: 14px;
+            color: #b0e0ff;
+            font-size: 22px;
+        }
+
+        .welcome-language-toggle {
+            min-height: 42px;
+            padding: 8px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 160ms ease, border-color 160ms ease;
+        }
+
+        .welcome-language-toggle:hover {
+            border-color: rgba(176, 224, 255, 0.9);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .welcome-language-toggle:focus-visible,
+        .welcome-cta:focus-visible {
+            outline: 3px solid #b0e0ff;
+            outline-offset: 4px;
+        }
+
+        .welcome-content {
+            width: min(1180px, 100%);
+            margin: auto;
+            padding: 72px 0 58px;
+        }
+
+        .welcome-copy {
+            max-width: 710px;
+        }
+
+        .welcome-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 22px;
+            color: #b0e0ff;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .welcome-eyebrow::before {
+            width: 30px;
+            height: 1px;
+            background: currentColor;
+            content: "";
+        }
+
+        .welcome-title {
+            max-width: 680px;
+            margin: 0;
+            font-size: clamp(42px, 7vw, 82px);
+            font-weight: 700;
+            letter-spacing: -0.045em;
+            line-height: 1.16;
+            text-wrap: balance;
+        }
+
+        .welcome-title span {
+            color: #b0e0ff;
+        }
+
+        .welcome-description {
+            max-width: 570px;
+            margin: 24px 0 0;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: clamp(16px, 1.6vw, 19px);
+            line-height: 1.9;
+        }
+
+        .welcome-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            min-height: 54px;
+            margin-top: 32px;
+            padding: 0 24px;
+            border: 1px solid #b0e0ff;
+            border-radius: 8px;
+            background: #b0e0ff;
+            color: #062b68;
+            font: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 160ms ease, background 160ms ease;
+        }
+
+        .welcome-cta:hover {
+            transform: translateY(-2px);
+            background: #d5efff;
+        }
+
+        .welcome-cta-arrow {
+            font-size: 19px;
+            line-height: 1;
+        }
+
+        html[dir="rtl"] .welcome-cta-arrow {
+            transform: scaleX(-1);
+        }
+
+        .welcome-features {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            width: min(900px, 100%);
+            margin-top: clamp(52px, 8vh, 88px);
+        }
+
+        .welcome-feature {
+            min-height: 105px;
+            padding: 18px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(8px);
+        }
+
+        .welcome-feature-number {
+            display: block;
+            margin-bottom: 8px;
+            color: #b0e0ff;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+        }
+
+        .welcome-feature h2 {
+            margin: 0;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .welcome-footer {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+            color: rgba(255, 255, 255, 0.58);
+            font-size: 12px;
+        }
+
         .map-reference-info {
             position: absolute;
             z-index: 450;
@@ -143,6 +374,19 @@
             font: inherit;
             font-size: 12px;
             cursor: pointer;
+        }
+
+        .map-home-toggle {
+            display: grid;
+            width: 36px;
+            min-height: 34px;
+            padding: 6px;
+            place-items: center;
+        }
+
+        .map-home-toggle svg {
+            width: 18px;
+            height: 18px;
         }
 
         .map-heading-toggle:hover {
@@ -273,6 +517,61 @@
         }
 
         @media (max-width: 600px) {
+            .welcome-screen {
+                padding-right: 20px;
+                padding-left: 20px;
+            }
+
+            .welcome-brand {
+                font-size: 13px;
+            }
+
+            .welcome-brand-mark {
+                width: 38px;
+                height: 38px;
+                border-radius: 12px;
+            }
+
+            .welcome-content {
+                padding: 64px 0 44px;
+            }
+
+            .welcome-title {
+                font-size: clamp(39px, 12vw, 58px);
+            }
+
+            .welcome-description {
+                margin-top: 18px;
+                font-size: 15px;
+            }
+
+            .welcome-cta {
+                width: 100%;
+                margin-top: 24px;
+            }
+
+            .welcome-features {
+                grid-template-columns: 1fr;
+                gap: 9px;
+                margin-top: 42px;
+            }
+
+            .welcome-feature {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                min-height: 68px;
+                padding: 12px 15px;
+            }
+
+            .welcome-feature-number {
+                margin: 0;
+            }
+
+            .welcome-feature h2 {
+                font-size: 14px;
+            }
+
             .map-reference-info {
                 right: 10px;
                 bottom: max(79px, calc(env(safe-area-inset-bottom) + 75px));
@@ -413,11 +712,60 @@
 </head>
 <body>
     <main id="map" aria-label="خريطة تفاعلية لمنطقة عسير" data-i18n-aria="mapLabel"></main>
-    <header class="map-heading">
+    <section class="welcome-screen" id="welcome-screen" aria-labelledby="welcome-title">
+        <nav class="welcome-nav" aria-label="التنقل الرئيسي" data-i18n-aria="mainNavigation">
+            <div class="welcome-brand">
+                <span class="welcome-brand-mark" aria-hidden="true">ع</span>
+                <span data-i18n="title">مستكشف منطقة عسير</span>
+            </div>
+            <button class="welcome-language-toggle language-toggle" id="welcome-language-toggle"
+                type="button" aria-label="Switch to English" data-i18n-aria="languageToggleLabel">English</button>
+        </nav>
+        <div class="welcome-content">
+            <div class="welcome-copy">
+                <p class="welcome-eyebrow" data-i18n="welcomeEyebrow">من قلب الجنوب السعودي</p>
+                <h1 class="welcome-title" id="welcome-title">
+                    <span data-i18n="welcomeTitleHighlight">عسير</span><span data-i18n="welcomeTitleRest">، أقرب إليك</span>
+                </h1>
+                <p class="welcome-description" data-i18n="welcomeDescription">
+                    اكتشف جغرافية منطقة عسير وتعرّف على محافظاتها ومراكزها وأحيائها عبر خريطة تفاعلية واحدة.
+                </p>
+                <button class="welcome-cta" id="start-exploring" type="button">
+                    <span data-i18n="startExploring">ابدأ الاستكشاف</span>
+                    <span class="welcome-cta-arrow" aria-hidden="true">→</span>
+                </button>
+            </div>
+            <div class="welcome-features" aria-label="مميزات التطبيق" data-i18n-aria="featuresLabel">
+                <article class="welcome-feature">
+                    <span class="welcome-feature-number">01</span>
+                    <h2 data-i18n="featureGovernorates">تصفّح محافظات المنطقة</h2>
+                </article>
+                <article class="welcome-feature">
+                    <span class="welcome-feature-number">02</span>
+                    <h2 data-i18n="featureLayers">استكشف المراكز والأحياء</h2>
+                </article>
+                <article class="welcome-feature">
+                    <span class="welcome-feature-number">03</span>
+                    <h2 data-i18n="featureProjects">اطّلع على طبقات المشاريع</h2>
+                </article>
+            </div>
+        </div>
+        <footer class="welcome-footer" data-i18n="welcomeFooter">منطقة عسير — المملكة العربية السعودية</footer>
+    </section>
+    <header class="map-heading" hidden>
         <div class="map-heading-header">
             <h1 data-i18n="title">مستكشف منطقة عسير</h1>
             <div class="map-heading-actions">
-                <button class="map-heading-toggle" id="language-toggle" type="button"
+                <button class="map-heading-toggle map-home-toggle" id="home-button" type="button"
+                    aria-label="العودة إلى الصفحة الرئيسية" data-i18n-aria="homeLabel">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m3 10 9-7 9 7"></path>
+                        <path d="M5 9v12h14V9"></path>
+                        <path d="M9 21v-7h6v7"></path>
+                    </svg>
+                </button>
+                <button class="map-heading-toggle language-toggle" id="language-toggle" type="button"
                     aria-label="Switch to English" data-i18n-aria="languageToggleLabel">English</button>
                 <button class="map-heading-toggle" id="map-heading-toggle" type="button"
                     aria-expanded="true" aria-controls="map-heading-content" data-i18n="hidePanel">إخفاء القائمة</button>
@@ -489,12 +837,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.12.1/proj4.js"></script>
     <script>
         const message = document.getElementById("map-message");
-        const languageToggle = document.getElementById("language-toggle");
+        const languageToggles = document.querySelectorAll(".language-toggle");
+        const welcomeScreen = document.getElementById("welcome-screen");
+        const startExploringButton = document.getElementById("start-exploring");
+        const homeButton = document.getElementById("home-button");
+        const mapHeading = document.querySelector(".map-heading");
         const mapHeadingToggle = document.getElementById("map-heading-toggle");
         const mapHeadingContent = document.getElementById("map-heading-content");
         const translations = {
             ar: {
                 title: "مستكشف منطقة عسير",
+                mainNavigation: "التنقل الرئيسي",
+                homeLabel: "العودة إلى الصفحة الرئيسية",
+                welcomeEyebrow: "من قلب الجنوب السعودي",
+                welcomeTitleHighlight: "عسير",
+                welcomeTitleRest: "، أقرب إليك",
+                welcomeDescription: "اكتشف جغرافية منطقة عسير وتعرّف على محافظاتها ومراكزها وأحيائها عبر خريطة تفاعلية واحدة.",
+                startExploring: "ابدأ الاستكشاف",
+                featuresLabel: "مميزات التطبيق",
+                featureGovernorates: "تصفّح محافظات المنطقة",
+                featureLayers: "استكشف المراكز والأحياء",
+                featureProjects: "اطّلع على طبقات المشاريع",
+                welcomeFooter: "منطقة عسير — المملكة العربية السعودية",
                 mapLabel: "خريطة تفاعلية لمنطقة عسير",
                 languageToggle: "English",
                 languageToggleLabel: "Switch to English",
@@ -557,6 +921,18 @@
             },
             en: {
                 title: "Aseer Region Explorer",
+                mainNavigation: "Main navigation",
+                homeLabel: "Return to the home page",
+                welcomeEyebrow: "From the heart of Saudi Arabia's south",
+                welcomeTitleHighlight: "Aseer",
+                welcomeTitleRest: ", closer to you",
+                welcomeDescription: "Discover the geography of Aseer Region and explore its governorates, centers, and districts on one interactive map.",
+                startExploring: "Start exploring",
+                featuresLabel: "App features",
+                featureGovernorates: "Browse the region's governorates",
+                featureLayers: "Explore centers and districts",
+                featureProjects: "View project map layers",
+                welcomeFooter: "Aseer Region — Kingdom of Saudi Arabia",
                 mapLabel: "Interactive map of Aseer Region",
                 languageToggle: "العربية",
                 languageToggleLabel: "التبديل إلى العربية",
@@ -649,8 +1025,10 @@
             document.querySelectorAll("[data-i18n-aria]").forEach(function (element) {
                 element.setAttribute("aria-label", translate(element.getAttribute("data-i18n-aria")));
             });
-            languageToggle.textContent = translate("languageToggle");
-            languageToggle.setAttribute("aria-label", translate("languageToggleLabel"));
+            languageToggles.forEach(function (toggle) {
+                toggle.textContent = translate("languageToggle");
+                toggle.setAttribute("aria-label", translate("languageToggleLabel"));
+            });
             const panelExpanded = mapHeadingToggle.getAttribute("aria-expanded") === "true";
             mapHeadingToggle.textContent = translate(panelExpanded ? "hidePanel" : "showPanel");
             const messageDetail = mapMessageDetailKey
@@ -671,9 +1049,25 @@
             refreshDynamicLanguage();
         }
 
-        languageToggle.addEventListener("click", function () {
-            currentLanguage = currentLanguage === "ar" ? "en" : "ar";
-            applyLanguage();
+        languageToggles.forEach(function (toggle) {
+            toggle.addEventListener("click", function () {
+                currentLanguage = currentLanguage === "ar" ? "en" : "ar";
+                applyLanguage();
+            });
+        });
+
+        startExploringButton.addEventListener("click", function () {
+            welcomeScreen.hidden = true;
+            mapHeading.hidden = false;
+            map.invalidateSize();
+            document.getElementById("governorate-search").focus();
+        });
+
+        homeButton.addEventListener("click", function () {
+            mapHeading.hidden = true;
+            welcomeScreen.hidden = false;
+            map.invalidateSize();
+            startExploringButton.focus();
         });
 
         const projectStatuses = [
